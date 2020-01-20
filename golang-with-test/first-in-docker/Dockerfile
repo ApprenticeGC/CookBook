@@ -1,4 +1,4 @@
-FROM golang:alpine
+FROM golang:alpine AS builder
 
 # Set necessary environmet variables needed for our image
 ENV GO111MODULE=on \
@@ -17,6 +17,9 @@ RUN go mod download
 # Copy the code into the container
 COPY . .
 
+# Run test
+RUN go test ./...
+
 # Build the application
 RUN go build -o main .
 
@@ -26,8 +29,13 @@ WORKDIR /dist
 # Copy binary from build to main folder
 RUN cp /build/main .
 
-# Export necessary port
-EXPOSE 3000
+############################
+# STEP 2 build a small image
+############################
+FROM scratch
 
-# Command to run when starting the container
-CMD ["/dist/main"]
+COPY --from=builder /dist/main /
+# COPY ./database/data.json /database/data.json
+
+# Command to run the executable
+ENTRYPOINT ["/main"]
