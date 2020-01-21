@@ -7,5 +7,7 @@ time DOCKER_BUILDKIT=1 docker image build -t gin-in-docker:latest --no-cache .
 
 docker build . -t go-dock
 docker run -p 3000:3000 go-dock
+
+docker run -d -p 3000:3000 --rm go-dock
 docker container run -it go-dock /bin/sh
 ```
