@@ -1,5 +1,6 @@
 namespace GiantCroissant.FllowCodeMonkey.FindTargetInUnityECS
 {
+    using Unity.Collections;
     using Unity.Entities;
     using Unity.Mathematics;
     using Unity.Transforms;
@@ -7,41 +8,75 @@ namespace GiantCroissant.FllowCodeMonkey.FindTargetInUnityECS
 
     public class FindTargetSystem : SystemBase
     {
+        private EntityCommandBufferSystem _entityCommandBufferSystem;
+        private EntityQuery _targetQuery;
+
+        protected override void OnCreate()
+        {
+            base.OnCreate();
+
+            _entityCommandBufferSystem = World.GetOrCreateSystem<EntityCommandBufferSystem>();
+            
+            var query = new EntityQueryDesc
+            {
+                All = new ComponentType[] { typeof(Target), typeof(Translation) }
+            };
+
+            _targetQuery = GetEntityQuery(query);
+        }
+
         protected override void OnUpdate()
         {
-            Entities.WithAll<Unit>().ForEach((Entity uniEntity, Translation unitTranslation) =>
+            var commandBuffer = _entityCommandBufferSystem.CreateCommandBuffer();
+            
+            Entities
+                .WithNone<HasTarget>()
+                .WithAll<Unit>().ForEach((Entity unitEntity, ref Translation unitTranslation) =>
             {
                 //
                 var unitPosition = unitTranslation.Value;
                 
                 var closestTargetEntity = Entity.Null;
                 var closestTargetPosition = float3.zero;
-                Entities.WithAll<Target>().ForEach((Entity targetEntity, Translation targetTranslation) =>
+
+                var targetEntities = _targetQuery.ToEntityArray(Allocator.TempJob);
+                var targetTranslations = _targetQuery.ToComponentDataArray<Translation>(Allocator.TempJob);
                 {
-                    //
-                    if (closestTargetEntity == Entity.Null)
+                    for (var i = 0; i < targetEntities.Length; ++i)
                     {
-                        closestTargetEntity = targetEntity;
-                        closestTargetPosition = targetTranslation.Value;
-                    }
-                    else
-                    {
-                        var comparedTargetDistance = math.distance(unitPosition, targetTranslation.Value);
-                        var cachedTargetDistance = math.distance(unitPosition, closestTargetPosition);
-                        if (comparedTargetDistance < cachedTargetDistance)
+                        var targetEntity = targetEntities[i];
+                        var targetTranslation = targetTranslations[i];
+                        
+                        if (closestTargetEntity == Entity.Null)
                         {
                             closestTargetEntity = targetEntity;
                             closestTargetPosition = targetTranslation.Value;
                         }
+                        else
+                        {
+                            var comparedTargetDistance = math.distance(unitPosition, targetTranslation.Value);
+                            var cachedTargetDistance = math.distance(unitPosition, closestTargetPosition);
+                            if (comparedTargetDistance < cachedTargetDistance)
+                            {
+                                closestTargetEntity = targetEntity;
+                                closestTargetPosition = targetTranslation.Value;
+                            }
+                        }
                     }
-                })
-                    .WithoutBurst()
-                    .Run();
+                }
 
                 if (closestTargetEntity != Entity.Null)
                 {
-                    Debug.DrawLine(unitPosition, closestTargetPosition);
+                    Debug.Log($"closest: {closestTargetEntity}");
+                    // Debug.DrawLine(unitPosition, closestTargetPosition);
+                    commandBuffer.AddComponent<HasTarget>(unitEntity, new HasTarget
+                    {
+                        targetEntity = closestTargetEntity
+                    });
                 }
+
+                targetEntities.Dispose();
+                targetTranslations.Dispose();
             })
                 .WithoutBurst()
                 .Run();
