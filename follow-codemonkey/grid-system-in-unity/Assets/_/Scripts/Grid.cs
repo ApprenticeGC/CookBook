@@ -1,13 +1,22 @@
 ﻿namespace GiantCroissant.FollowCodeMonkey.GridSystemInUnity
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
     
     using CodeMonkey.Utils;
 
+    public class OnGridValueChangedEventArgs : EventArgs
+    {
+        public int x;
+        public int y;
+    }
+
     public class Grid
     {
+        public event EventHandler<OnGridValueChangedEventArgs> OnGridValueChanged;
+        
         private readonly int _width;
         private readonly int _height;
 
@@ -54,6 +63,10 @@
             SetValue(2, 1, 56);
         }
 
+        public int GetWidth => _width;
+        public int GetHeight => _height;
+        public float GetCellSize => _cellSize;
+
         private Vector3 GetWorldPosition(int x, int y)
         {
             return (new Vector3(x, y) * _cellSize + _originPosition);
@@ -73,6 +86,11 @@
             {
                 _gridArray[x, y] = value;
                 _debugTextArray[x, y].text = _gridArray[x, y].ToString();
+
+                if (OnGridValueChanged != null)
+                {
+                    OnGridValueChanged(this, new OnGridValueChangedEventArgs {x = x, y = y});
+                }
             }
         }
 
