@@ -1,0 +1,10 @@
+/*
+
+!.gitignore
+
+*.meta
+!*.*.meta
+
+!_
+# !Universal RP
+
