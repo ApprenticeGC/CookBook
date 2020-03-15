@@ -249,6 +249,12 @@ MonoBehaviour:
   frontierColor: {r: 1, g: 0, b: 1, a: 1}
   exploredColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   pathColor: {r: 0, g: 1, b: 1, a: 1}
+  arrowColor: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  highlightColor: {r: 1, g: 1, b: 0.5, a: 1}
+  showIterations: 0
+  showColors: 1
+  showArrows: 1
+  exitOnGoal: 1
   isComplete: 0
 --- !u!4 &424671778
 Transform:
@@ -318,7 +324,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 7
+  orthographic size: 19
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -342,7 +348,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 641502461}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 7.5, y: 20, z: 4}
+  m_LocalPosition: {x: 31.5, y: 20, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -518,9 +524,9 @@ MonoBehaviour:
   pathfinder: {fileID: 424671777}
   startX: 0
   startY: 0
-  goalX: 10
-  goalY: 4
-  timeStep: 0.2
+  goalX: 52
+  goalY: 14
+  timeStep: 0.01
 --- !u!4 &1972912220
 Transform:
   m_ObjectHideFlags: 0
