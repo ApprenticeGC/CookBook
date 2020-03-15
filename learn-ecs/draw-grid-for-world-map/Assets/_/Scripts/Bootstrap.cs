@@ -115,6 +115,7 @@
         private BeginSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
     
         private EntityQuery _mapQuery;
+        private EntityArchetype _visualMapArchetype;
 
         protected override void OnCreate()
         {
@@ -124,6 +125,9 @@
                 ComponentType.ReadOnly<GenerateMap>(),
                 ComponentType.ReadOnly<MapData>(),
                 ComponentType.ReadOnly<MapTileBuffer>());
+
+            _visualMapArchetype = EntityManager.CreateArchetype(
+                typeof(GenerateVisualMap));
 
             _entityCommandBufferSystem = World.GetOrCreateSystem<BeginSimulationEntityCommandBufferSystem>();
             
@@ -138,6 +142,9 @@
             var mapEntity = _mapQuery.GetSingletonEntity();
             // var mapData = EntityManager.GetComponentData<MapData>(mapEntity);
             var mapTileBuffer = EntityManager.GetBuffer<MapTileBuffer>(mapEntity);
+            
+            var visualMapArchetype = EntityManager.CreateArchetype(
+                typeof(GenerateVisualMap));
 
             Entities
                 .WithAll<GenerateMap>()
@@ -200,6 +207,11 @@
                 .WithBurst(FloatMode.Default, FloatPrecision.Standard, true)
                 .ForEach((Entity entity, int entityInQueryIndex) =>
                 {
+                    var eventEntity =
+                        concurrentCommandBuffer.CreateEntity(entityInQueryIndex, visualMapArchetype);
+                    
+                    concurrentCommandBuffer.AddComponent<GenerateVisualMap>(entityInQueryIndex, eventEntity);
+                    
                     concurrentCommandBuffer.RemoveComponent<GenerateMap>(entityInQueryIndex, entity);
                 })
                 .Schedule();
@@ -208,11 +220,11 @@
             _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
         }
     }
-
-    // [AlwaysSynchronizeSystem]
+    
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class PresentMapSystem : SystemBase
+    public class ModifyVisualMapSystem : SystemBase
     {
+        // private BeginSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
         private BeginPresentationEntityCommandBufferSystem _entityCommandBufferSystem;
         private EntityQuery _mapQuery;
         private EntityQuery _visualMapQuery;
@@ -220,7 +232,10 @@
         protected override void OnCreate()
         {
             base.OnCreate();
-            
+
+            // _entityCommandBufferSystem = World.GetOrCreateSystem<BeginSimulationEntityCommandBufferSystem>();
+            _entityCommandBufferSystem = World.GetOrCreateSystem<BeginPresentationEntityCommandBufferSystem>();
+         
             _mapQuery = GetEntityQuery(
                 ComponentType.ReadOnly<MapData>(),
                 ComponentType.ReadOnly<MapTileBuffer>());
@@ -228,16 +243,15 @@
             _visualMapQuery = GetEntityQuery(
                 ComponentType.ReadOnly<VisualMapData>(),
                 typeof(RenderMesh));
-    
-            _entityCommandBufferSystem = World.GetOrCreateSystem<BeginPresentationEntityCommandBufferSystem>();
             
             RequireForUpdate(_mapQuery);
             RequireForUpdate(_visualMapQuery);
         }
-    
+
         protected override void OnUpdate()
         {
             var commandBuffer = _entityCommandBufferSystem.CreateCommandBuffer();
+            // var commandBuffer = _entityCommandBufferSystem.CreateCommandBuffer().ToConcurrent();
             
             var mapEntity = _mapQuery.GetSingletonEntity();
             var mapData = _mapQuery.GetSingleton<MapData>();
@@ -245,26 +259,88 @@
 
             var visualMapEntity = _visualMapQuery.GetSingletonEntity();
             var renderMesh = EntityManager.GetSharedComponentData<RenderMesh>(visualMapEntity);
-            
-            Job
-                .WithoutBurst()
-                .WithCode(() =>
+
+            Entities
+                .WithAll<GenerateVisualMap>()
+                // .ForEach((Entity entity) =>
+                .ForEach((Entity entity, int entityInQueryIndex) =>
                 {
-                    //
                     var w = mapData.Width;
                     var h = mapData.Height;
-                    // Debug.Log($"Making grid mesh - w: {w} h: {h}");
+                    Debug.Log($"Making grid mesh - w: {w} h: {h}");
                     var mesh = MeshUtility.GenerateGrid(w, h);
-                    
-                    // commandBuffer.AddComponent(mapEntity, );
+
                     renderMesh.mesh = mesh;
                     commandBuffer.SetSharedComponent(visualMapEntity, renderMesh);
+                    // commandBuffer.SetSharedComponent(entityInQueryIndex, visualMapEntity, renderMesh);
+
+                    commandBuffer.DestroyEntity(entity);
+                    // commandBuffer.DestroyEntity(entityInQueryIndex, entity);
                 })
+                .WithoutBurst()
                 .Run();
+                // .Schedule();
             
             _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
         }
     }
+
+    // // [AlwaysSynchronizeSystem]
+    // [UpdateInGroup(typeof(PresentationSystemGroup))]
+    // public class PresentMapSystem : SystemBase
+    // {
+    //     private BeginPresentationEntityCommandBufferSystem _entityCommandBufferSystem;
+    //     private EntityQuery _mapQuery;
+    //     private EntityQuery _visualMapQuery;
+    //
+    //     protected override void OnCreate()
+    //     {
+    //         base.OnCreate();
+    //         
+    //         _mapQuery = GetEntityQuery(
+    //             ComponentType.ReadOnly<MapData>(),
+    //             ComponentType.ReadOnly<MapTileBuffer>());
+    //
+    //         _visualMapQuery = GetEntityQuery(
+    //             ComponentType.ReadOnly<VisualMapData>(),
+    //             typeof(RenderMesh));
+    //
+    //         _entityCommandBufferSystem = World.GetOrCreateSystem<BeginPresentationEntityCommandBufferSystem>();
+    //         
+    //         RequireForUpdate(_mapQuery);
+    //         RequireForUpdate(_visualMapQuery);
+    //     }
+    //
+    //     protected override void OnUpdate()
+    //     {
+    //         var commandBuffer = _entityCommandBufferSystem.CreateCommandBuffer();
+    //         
+    //         var mapEntity = _mapQuery.GetSingletonEntity();
+    //         var mapData = _mapQuery.GetSingleton<MapData>();
+    //         var mapTileBuffer = EntityManager.GetBuffer<MapTileBuffer>(mapEntity);
+    //
+    //         var visualMapEntity = _visualMapQuery.GetSingletonEntity();
+    //         var renderMesh = EntityManager.GetSharedComponentData<RenderMesh>(visualMapEntity);
+    //         
+    //         Job
+    //             .WithoutBurst()
+    //             .WithCode(() =>
+    //             {
+    //                 //
+    //                 var w = mapData.Width;
+    //                 var h = mapData.Height;
+    //                 // Debug.Log($"Making grid mesh - w: {w} h: {h}");
+    //                 var mesh = MeshUtility.GenerateGrid(w, h);
+    //                 
+    //                 // commandBuffer.AddComponent(mapEntity, );
+    //                 renderMesh.mesh = mesh;
+    //                 commandBuffer.SetSharedComponent(visualMapEntity, renderMesh);
+    //             })
+    //             .Run();
+    //         
+    //         _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+    //     }
+    // }
     
     public class Bootstrap : MonoBehaviour
     {

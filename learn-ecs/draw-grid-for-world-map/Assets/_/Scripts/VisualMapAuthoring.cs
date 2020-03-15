@@ -5,6 +5,10 @@
     using Unity.Transforms;
     using UnityEngine;
 
+    public struct GenerateVisualMap : IComponentData
+    {
+    }
+
     [RequiresEntityConversion]
     public class VisualMapAuthoring :
         MonoBehaviour,
