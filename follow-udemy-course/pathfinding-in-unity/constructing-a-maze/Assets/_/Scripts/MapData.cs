@@ -1,6 +1,8 @@
 ﻿namespace GiantCroissant.FollowUdemyCourse.PathfindingInUnity
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using UnityEngine;
 
     public class MapData : MonoBehaviour
@@ -8,25 +10,74 @@
         public int width = 10;
         public int height = 5;
 
-        private void Start()
+        public TextAsset textAsset;
+
+        public List<string> GetTextFromFile(TextAsset ta)
         {
-            // int[,] map = MakeMap();
+            var lines = new List<string>();
+
+            if (ta != null)
+            {
+                var textData = ta.text;
+
+                string[] delimiters = {"\r\n", "\n"};
+
+                lines.AddRange(textData.Split(delimiters, System.StringSplitOptions.None));
+                lines.Reverse();
+            }
+            else
+            {
+                Debug.LogWarning($"GetTextFromFile - invalid text asset");
+            }
+
+            return lines;
+        }
+
+        public List<string> GetTextFromFile()
+        {
+            return GetTextFromFile(textAsset);
+        }
+
+        public void SetDimensions(List<string> textLines)
+        {
+            height = textLines.Count;
+            foreach (var line in textLines)
+            {
+                if (line.Length > width)
+                {
+                    width = line.Length;
+                }
+            }
         }
 
         public int[,] MakeMap()
         {
+            var lines = new List<string>();
+            lines = GetTextFromFile();
+            SetDimensions(lines);
+
+            // var desc = lines.Aggregate("", (acc, next) => { return $"{acc}\n {next}"; });
+            // Debug.Log(desc);
+            
             int[,] map = new int[width, height];
 
             for (var y = 0; y < height; ++y)
             {
-                for (var x = 0; x < width; ++width)
+                for (var x = 0; x < width; ++x)
                 {
-                    map[x, y] = 0;
+                    // map[x, y] = 0;
+                    if (lines[y].Length > x)
+                    {
+                        var c = lines[y][x];
+                        var v = int.Parse(c.ToString());
+                        map[x, y] = v;
+                    }
                 }
             }
             
             //
-            MakeBlockStub(map);
+            // MakeBlockStub(map);
+            
             
             return map;
         }
