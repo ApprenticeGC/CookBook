@@ -97,5 +97,19 @@
         {
             return GraphUtility.GetNeighbors(x, y, _width, _height, nodes, GraphUtility.AllDirections);
         }
+
+        public float GetNodeDistance(Node source, Node target)
+        {
+            var dx = Mathf.Abs(source.xIndex - target.xIndex);
+            var dy = Mathf.Abs(source.yIndex - target.yIndex);
+
+            var min = Mathf.Min(dx, dy);
+            var max = Mathf.Max(dx, dy);
+
+            var diagonalSteps = min;
+            var straightSteps = max - min;
+
+            return (1.4f * diagonalSteps + straightSteps);
+        }
     }
 }
