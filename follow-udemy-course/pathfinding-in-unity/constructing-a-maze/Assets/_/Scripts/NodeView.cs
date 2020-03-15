@@ -95,6 +95,8 @@
     public class NodeView : MonoBehaviour
     {
         public GameObject tile;
+        public GameObject arrow;
+        private Node _node;
 
         [Range(0, 0.5f)]
         public float borderSize = 0.15f;
@@ -107,7 +109,10 @@
                 gameObject.transform.position = node.position;
                 tile.transform.localScale = new Vector3(1.0f - borderSize, 1.0f, 1.0f - borderSize);
 
-                ReplaceMeshWith();
+                // ReplaceMeshWith();
+
+                _node = node;
+                EnableObject(arrow, false);
             }
         }
 
@@ -138,6 +143,31 @@
         public void ColorNode(Color color)
         {
             ColorNode(color, tile);
+        }
+
+        public void EnableObject(GameObject inGo, bool flag)
+        {
+            if (inGo != null)
+            {
+                inGo.SetActive(flag);
+            }
+        }
+
+        public void ShowArrow(Color color)
+        {
+            if (_node != null && arrow != null && _node.previousNode != null)
+            {
+                EnableObject(arrow, true);
+
+                var directionToPrevious = (_node.previousNode.position - _node.position).normalized;
+                arrow.transform.rotation = Quaternion.LookRotation(directionToPrevious);
+
+                var arrowRenderer = arrow.GetComponent<Renderer>();
+                if (arrowRenderer != null)
+                {
+                    arrowRenderer.material.color = color;
+                }
+            }
         }
     }
 }

@@ -53,6 +53,9 @@
         private int _width;
         private int _height;
 
+        public int Width => _width;
+        public int Height => _height;
+
         public void Construct(int[,] mapData)
         {
             _mapData = mapData;
