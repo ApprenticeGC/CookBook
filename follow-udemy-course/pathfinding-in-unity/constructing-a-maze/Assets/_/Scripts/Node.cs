@@ -9,7 +9,7 @@
         Blocked = 1
     }
     
-    public class Node
+    public class Node : System.IComparable<Node>
     {
         public NodeType nodeType = NodeType.Open;
 
@@ -23,6 +23,8 @@
         public float distanceTraveled = Mathf.Infinity;
         public Node previousNode = null;
 
+        public int priority;
+
         public Node(int xIndex, int yIndex, NodeType nodeType)
         {
             this.xIndex = xIndex;
@@ -33,6 +35,22 @@
         public void Reset()
         {
             previousNode = null;
+        }
+
+        public int CompareTo(Node other)
+        {
+            if (this.priority < other.priority)
+            {
+                return -1;
+            }
+            else if (this.priority > other.priority)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }
