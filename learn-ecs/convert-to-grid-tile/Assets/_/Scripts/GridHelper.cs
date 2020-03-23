@@ -2,7 +2,7 @@
 {
     using Unity.Mathematics;
 
-    public static class GeneralGridHelper
+    public static class GridHelper
     {
         public enum Direction : int
         {
@@ -23,6 +23,29 @@
             public int4 Value2;
         }
 
+        private static int GridIndexOneSide(float gridCellSize, float position) =>
+            (int)math.floor(position / gridCellSize);
+        
+        public static int GridCellIndex(
+            int hGridCellCount, int vGridCellCount,
+            float hGridCellSize, float vGridCellSize,
+            float hPosition, float vPosition)
+        {
+            var hIndex = GridIndexOneSide(hGridCellSize, hPosition);
+            var vIndex = GridIndexOneSide(vGridCellSize, vPosition);
+
+            var index = (vIndex * hGridCellCount) + hIndex;
+
+            return index;
+        }
+
+        public static int GridCellIndex(
+            int2 gridCellCount, float2 gridCellSize, float2 position) =>
+            GridCellIndex(
+                gridCellCount.x, gridCellCount.y,
+                gridCellSize.x, gridCellSize.y,
+                position.x, position.y);
+        
         public static int GridIndex1D(
             int hGridCellCount, int vGridCellCount,
             int hIndex, int vIndex) =>
