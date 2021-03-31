@@ -1,0 +1,33 @@
+{
+    "name": "Controls",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "c73eb034-8eb2-49e6-bc6e-fbecde0837bc",
+            "actions": [
+                {
+                    "name": "Fire",
+                    "type": "Button",
+                    "id": "54d7d02e-bd48-4628-8f38-caa929fc88b9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d19831ba-0dc2-406a-b4fd-730821a149dd",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

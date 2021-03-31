@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e66c6366d904e98bc83428217d4fd7, type: 3}
+  m_Name: Unity Event
+  m_EditorClassIdentifier: 
+  _data:
+    _json: '{"graph":{"variables":{"collection":{"$content":[],"$version":"A"},"$version":"A"},"controlInputDefinitions":[],"controlOutputDefinitions":[],"valueInputDefinitions":[],"valueOutputDefinitions":[],"title":null,"summary":null,"pan":{"x":0.0,"y":0.0},"zoom":1.0,"elements":[{"coroutine":false,"defaultValues":{"name":{"$content":"OnFireByUnityEvent","$type":"System.String"}},"position":{"x":-537.0,"y":-183.0},"guid":"aa51cd16-1a88-4ef8-8035-8198d9ddbd41","$version":"A","$type":"Unity.VisualScripting.BoltUnityEvent","$id":"9"},{"chainable":false,"member":{"name":"Log","parameterTypes":["System.Object"],"targetType":"UnityEngine.Debug","targetTypeName":"UnityEngine.Debug","$version":"A"},"defaultValues":{},"position":{"x":-206.0,"y":-173.0},"guid":"e84012e2-3bd4-4b56-b2f7-9971d0dedac2","$version":"A","$type":"Unity.VisualScripting.InvokeMember","$id":"11"},{"type":"System.String","value":{"$content":"Should
+      Fire","$type":"System.String"},"defaultValues":{},"position":{"x":-421.0,"y":-16.0},"guid":"3ea096e9-6f76-4c32-8454-c2dd9a07fbb8","$version":"A","$type":"Unity.VisualScripting.Literal","$id":"14"},{"sourceUnit":{"$ref":"9"},"sourceKey":"trigger","destinationUnit":{"$ref":"11"},"destinationKey":"enter","guid":"aa907e04-9e22-44c4-a2c0-f66c2c3c027e","$type":"Unity.VisualScripting.ControlConnection"},{"sourceUnit":{"$ref":"14"},"sourceKey":"output","destinationUnit":{"$ref":"11"},"destinationKey":"%message","guid":"155c6bc6-7af6-4025-9736-bcaa620ada15","$type":"Unity.VisualScripting.ValueConnection"}],"$version":"A"}}'
+    _objectReferences: []
