@@ -1,0 +1,28 @@
+/*
+
+*.meta
+!*.*.meta
+
+!.gitignore
+
+!_
+
+# Some Unity package create assets under Assets/Editor folder and unsure if these can be moved
+!Editor
+!Editor Default Resources
+!Gizmos
+!Plugins
+# Not adding a sub folder gitignore file into Resources for clean purpose
+!Resources
+Resources/**
+!Standard Assets
+# Not adding a sub folder gitignore file into StreamingAssets for clean purpose
+!StreamingAssets
+StreamingAssets/**
+!StreamingAssets/version.txt
+!StreamingAssets/version.txt.meta
+
+# ProBuilder URP material is inside sample folder, so source control it
+!Samples
+Samples/**
+!Samples/ProBuilder
